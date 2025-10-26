@@ -1,9 +1,13 @@
 #!/bin/bash
+echo "Updating pacman and installing ntfs-3g"
+sudo pacman -Syu
+sudo pacman -S ntfs-3g
+
 echo "Creating mount directories in /run/media/veprovina/"
 #Make new directories as mount points for fstab (uncomment below)
-mkdir -p /run/media/veprovina/Data
-mkdir -p /run/media/veprovina/Storage
-mkdir -p /run/media/veprovina/HDD
+sudo mkdir -p /run/media/veprovina/Data
+sudo mkdir -p /run/media/veprovina/Storage
+sudo mkdir -p /run/media/veprovina/HDD
 
 echo "Adding drive UUIDs to /etc/fstab"
 #Makes new line at the end of file - for /etc/fstab
@@ -26,9 +30,6 @@ ATTRS{name}=="Sony Interactive Entertainment DualSense Wireless Controller Touch
 # Bluetooth
 ATTRS{name}=="DualSense Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
 EOF
-
-echo "Updating pacman before package installation"
-sudo pacman -Syu
 
 echo "Executing cachyos-repo.sh script to add CachyOS repositories to Arch Linux"
 curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
