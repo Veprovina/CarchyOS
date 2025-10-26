@@ -1,1 +1,1 @@
-Personal learning script for post-install operations on Arch Linux to add CachyOS repositories, CachyOS kernel, and some configurations fstab, udev rules, and eventually full limine-snapper configuration, themes etc. for a personalized Arch Linux system.
+Personal learning script for post-install operations on Arch Linux to add CachyOS repositories, CachyOS kernel, and some configurations like mounting drives in fstab, udev rules, and eventually full limine-snapper configuration, themes etc. for a personalized Arch Linux system.
