@@ -3,31 +3,19 @@
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-echo -e "I ${CYAN}love${NC} Stack Overflow"
-
-echo -e "${CYAN}Updating pacman and installing ntfs-3g${NC}"
+echo -e "${CYAN}Updating pacman and installing CachyOS repositories${NC}"
 sudo pacman -Syu
-sudo pacman -S ntfs-3g
 
 echo -e "${CYAN}Executing cachyos-repo.sh script to add CachyOS repositories to Arch Linux${NC}"
 curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
 tar xvf cachyos-repo.tar.xz && cd cachyos-repo
 sudo ./cachyos-repo.sh
-cd ..
+cd /home/veprovina/
 
 echo -e "${CYAN}Installing packages${NC}"
 #Package manager, install software (replace with distro specific package manager syntax)
-sudo pacman -S cosmic
-
-echo -e "${CYAN}Creating dualsense udev rule to disable touchpad acting as a mouse${NC}"
-#Makes new file with exact lines - for /etc/udev/rules.d/72-dualsense.rules
-cat <<EOF > /etc/udev/rules.d/72-dualsense.rules
-# Disable DS4 touchpad acting as mouse
-# USB
-ATTRS{name}=="Sony Interactive Entertainment DualSense Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
-# Bluetooth
-ATTRS{name}=="DualSense Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
-EOF
+sudo pacman -S ntfs-3g cosmic linux-cachyos-bore linux-cachyos-bore-headers limine-mkinitcpio-hook
+sudo systemctl enable cosmic-greeter.service
 
 echo -e "${CYAN}Creating mount directories in /run/media/veprovina/${NC}"
 #Make new directories as mount points for fstab (uncomment below)
@@ -46,5 +34,18 @@ EOF
 echo -e "${CYAN}Mounting drives and reloading systemctl${NC}"
 sudo mount -a
 sudo systemctl daemon-reload
+
+echo -e "${CYAN}Creating dualsense udev rule to disable touchpad acting as a mouse${NC}"
+#Makes new file with exact lines - for /etc/udev/rules.d/72-dualsense.rules
+cat <<EOF > /etc/udev/rules.d/72-dualsense.rules
+# Disable DS4 touchpad acting as mouse
+# USB
+ATTRS{name}=="Sony Interactive Entertainment DualSense Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
+# Bluetooth
+ATTRS{name}=="DualSense Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
+EOF
+
+#Adding user to groups
+#sudo usermod -aG additional_groups username
 
 echo -e "${CYAN}Done!${NC}"
