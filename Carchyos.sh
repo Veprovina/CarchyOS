@@ -4,24 +4,38 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}Updating pacman and installing CachyOS repositories${NC}"
-sudo pacman -Syu
+pacman -Syu
 
 echo -e "${CYAN}Executing cachyos-repo.sh script to add CachyOS repositories to Arch Linux${NC}"
 curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
 tar xvf cachyos-repo.tar.xz && cd cachyos-repo
-sudo ./cachyos-repo.sh
+./cachyos-repo.sh
 cd /home/veprovina/
 
 echo -e "${CYAN}Installing packages${NC}"
 #Package manager, install software (replace with distro specific package manager syntax)
-sudo pacman -S nano bash-completion ntfs-3g cosmic linux-cachyos-bore linux-cachyos-bore-headers limine-mkinitcpio-hook
-sudo systemctl enable cosmic-greeter.service
+pacman -S --needed git base-devel flatpak nano bash-completion ntfs-3g cosmic linux-cachyos-bore linux-cachyos-bore-headers limine-mkinitcpio-hook ufw qemu-full apparmor
+systemctl enable cosmic-greeter.service
+
+echo -e "${CYAN}Executing yay install script${NC}"
+git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+
+echo -e "${CYAN}Adding flathub repository if not already installed${NC}"
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+echo -e "${CYAN}Enabling firewall (ufw)${NC}"
+systemctl enable --now ufw.service
+ufw enable
+
+echo -e "${CYAN}Apparmor configuration${NC}"
+systemctl enable --now apparmor.service
+aa-enabled
 
 echo -e "${CYAN}Creating mount directories in /run/media/veprovina/${NC}"
 #Make new directories as mount points for fstab (uncomment below)
-sudo mkdir -p /run/media/veprovina/Data
-sudo mkdir -p /run/media/veprovina/Storage
-sudo mkdir -p /run/media/veprovina/HDD
+mkdir -p /run/media/veprovina/Data
+mkdir -p /run/media/veprovina/Storage
+mkdir -p /run/media/veprovina/HDD
 
 echo -e "${CYAN}Adding drive UUIDs to /etc/fstab${NC}"
 #Makes new line at the end of file - for /etc/fstab - UNCOMMENT when not in VM
@@ -32,8 +46,8 @@ cat <<EOF >> /etc/fstab
 EOF
 
 echo -e "${CYAN}Mounting drives and reloading systemctl${NC}"
-sudo mount -a
-sudo systemctl daemon-reload
+mount -a
+systemctl daemon-reload
 
 echo -e "${CYAN}Creating dualsense udev rule to disable touchpad acting as a mouse${NC}"
 #Makes new file with exact lines - for /etc/udev/rules.d/72-dualsense.rules
@@ -46,14 +60,13 @@ ATTRS{name}=="DualSense Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVIC
 EOF
 
 #Adding user to groups
-#sudo usermod -aG additional_groups username
+#usermod -aG additional_groups username
 
 #TO DO LIST:
 # Add amd-ucode to pacman install after VM testing (https://wiki.archlinux.org/title/Microcode#Limine), as well as any packages to be installed on bare metal - programs, codecs, base-devel etc.
-# Add flathub repo as default after pacman package installation (flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo)
-# Add yay install script (https://github.com/Jguer/yay)
 # Have automatic confirmation for the script queries if possible - fully automated script - default answers for pacman (if applicable)
 # Apparmor - install and configure
+# Overwrite /etc/default/limine  with new configuration including apparmor kernel module loading, and any other module needed
 # Firewall configuration (check if Arch has one by default, otherwise probably ufw)
 # Activate NumLock on bootup - maybe - https://wiki.archlinux.org/title/Activating_numlock_on_bootup
 # Limine automatic snapshots with snapper - pacman hook
